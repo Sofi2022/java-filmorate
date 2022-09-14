@@ -22,6 +22,10 @@ public class UserController {
     public User addUser(@RequestBody User user) throws ValidationException {
         increaseUserId(user.getId());
         validateUser(user);
+        if ((user.getName() == null || user.getName().length() == 0)) {
+            user.setName(user.getLogin());
+        }
+        users.put(user.getId(), user);
         return user;
         }
 
@@ -31,15 +35,9 @@ public class UserController {
             throw new ValidationException("Такого id нет");
         }
         validateUser(user);
+        users.put(user.getId(), user);
         return user;
     }
-
-//        if(users.containsKey(user.getId())) {
-//            validateUser(user);
-//        }else{
-//            throw new ValidationException("Такого id нет");
-//        }
-//            return user;
 
     @GetMapping("/users")
     public List<User> getUsers () {
@@ -49,14 +47,12 @@ public class UserController {
     void validateUser(User user) throws ValidationException {
         if (user.getEmail() == null || !(user.getEmail().contains("@"))) {
             throw new ValidationException("Укажите Email с символом @");
-        } else if (user.getLogin().length() == 0 || user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-        } else if (user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        } else if (user.getBirthday().isAfter(LocalDate.of(2022, 9, 13))) {
+        }
+        if (user.getBirthday().isAfter(LocalDate.of(2022, 9, 13))) {
             throw new ValidationException("Дата рождения не может быть в будущем");
-        } else {
-            users.put(user.getId(), user);
+        }
+        if (user.getLogin().length() == 0 || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы");
         }
     }
 }

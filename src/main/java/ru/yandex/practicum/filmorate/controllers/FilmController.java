@@ -50,7 +50,7 @@ public class FilmController {
         if (film.getName().isEmpty() || film.getName() == null) {
             throw new ValidationException("Введите название фильма");
         } else if (film.getDescription().length() > 200) {
-            throw new ValidationException("Описание превышает 200 символов");
+            throw new ValidationException("Описание превышает 200 символов ");
         } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, DECEMBER, 28))) {
             throw new ValidationException("Дата релиза раньше 28.12.1895");
         } else if (film.getDuration() <= 0) {

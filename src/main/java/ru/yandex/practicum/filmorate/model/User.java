@@ -2,19 +2,21 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class User {
 
 
-    private Integer id = 1;
-
+    private Integer id;
+    @NotBlank
+    @Email
     private String email;
-
+    @Pattern(regexp = "^\\S*$")
+    @NotBlank
     private String login;
     private String name;
 
@@ -26,6 +28,5 @@ public class User {
         this.login = login;
         this.name = name;
         this.birthday = birthday;
-        id++;
     }
 }

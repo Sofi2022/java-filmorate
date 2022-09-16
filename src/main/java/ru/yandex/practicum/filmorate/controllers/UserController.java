@@ -43,6 +43,9 @@ public class UserController {
     }
 
     void validateUser(User user) throws ValidationException {
+        if(user == null){
+            throw new ValidationException("Объект не может быть пустым");
+        }
         if (user.getBirthday().isAfter(LocalDate.of(2022, 9, 13))) {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }

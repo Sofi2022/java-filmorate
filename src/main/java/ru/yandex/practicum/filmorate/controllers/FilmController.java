@@ -46,6 +46,9 @@ public class FilmController {
     }
 
     public void validateFilm(Film film) throws ValidationException {
+        if(film == null){
+            throw new ValidationException("Объект не может быть пустым");
+        }
          if (film.getReleaseDate().isBefore(LocalDate.of(1895, DECEMBER, 28))) {
             throw new ValidationException("Дата релиза раньше 28.12.1895");
         }

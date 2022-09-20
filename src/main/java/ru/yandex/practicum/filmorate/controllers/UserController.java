@@ -16,7 +16,7 @@ public class UserController {
     private Map<Integer, User> users = new HashMap<>();
 
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody User user) throws ValidationException {
+    public User addUser(@Valid @RequestBody User user) {
         validateUser(user);
         if ((user.getName() == null || user.getName().length() == 0)) {
             user.setName(user.getLogin());
@@ -27,7 +27,7 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
+    public User updateUser(@Valid @RequestBody User user) {
         if (users.containsKey(user.getId())) {
             validateUser(user);
             users.put(user.getId(), user);
@@ -42,7 +42,7 @@ public class UserController {
         return List.copyOf(users.values());
     }
 
-    void validateUser(User user) throws ValidationException {
+    void validateUser(User user) {
         if(user == null){
             throw new ValidationException("Объект не может быть пустым");
         }

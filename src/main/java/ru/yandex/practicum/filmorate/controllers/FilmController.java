@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Calendar.DECEMBER;
-
 @RestController
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
@@ -21,8 +19,11 @@ public class FilmController {
     private Map<Integer, Film> films = new HashMap<>();
 
     @PostMapping("/films")
-    public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film addFilm(@Valid @RequestBody Film film) {
         log.debug("Вызван /films");
+        if(films.containsKey(film.getId())){
+            updateFilm(film);
+        }
         validateFilm(film);
         film.setId(++filmId);
         films.put(film.getId(), film);
@@ -30,7 +31,7 @@ public class FilmController {
     }
 
     @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         if (films.containsKey(film.getId())) {
             validateFilm(film);
             films.put(film.getId(), film);
@@ -45,11 +46,11 @@ public class FilmController {
         return List.copyOf(films.values());
     }
 
-    public void validateFilm(Film film) throws ValidationException {
+    public void validateFilm(Film film) {
         if(film == null){
             throw new ValidationException("Объект не может быть пустым");
         }
-         if (film.getReleaseDate().isBefore(LocalDate.of(1895, DECEMBER, 28))) {
+         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата релиза раньше 28.12.1895");
         }
     }

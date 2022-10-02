@@ -28,12 +28,8 @@ public class FilmService {
     }
 
     public void deleteLike(int filmId, int userId) {
-        System.out.println("film " + filmStorage.getFilmById(filmId));
-        System.out.println("films " + filmStorage.getFilms());
-        System.out.println("users" + userStorage.getUsersIds());
         if (filmStorage.getFilms().containsKey(filmId) && userStorage.getUsersIds().contains(userId)){
                 Film film = filmStorage.getFilmById(filmId);
-                //System.out.println("id film " + film.getId());
                 film.deleteLike(userId);
             } else{
             throw new NotFoundException("Такого id нет");

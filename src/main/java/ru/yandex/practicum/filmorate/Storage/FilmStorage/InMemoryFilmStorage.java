@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.Storage.FilmStorage;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptionsHandler.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptionsHandler.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -66,9 +66,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата релиза раньше 28.12.1895");
         }
-    }
-
-    public Map<Integer, Film> getFilms() {
-        return films;
     }
 }

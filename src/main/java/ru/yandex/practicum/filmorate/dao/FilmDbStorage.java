@@ -2,14 +2,14 @@ package ru.yandex.practicum.filmorate.dao;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.Exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exceptionsHandler.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptionsHandler.ValidationException;
 import ru.yandex.practicum.filmorate.Storage.FilmStorage.FilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -26,8 +26,11 @@ public class FilmDbStorage implements FilmStorage {
     private final Logger log = LoggerFactory.getLogger(FilmDbStorage.class);
     private final JdbcTemplate jdbcTemplate;
 
-    public FilmDbStorage(JdbcTemplate jdbcTemplate) {
+    private final FilmGenresDbStorage filmGenresDbStorage;
+    @Autowired
+    public FilmDbStorage(JdbcTemplate jdbcTemplate, FilmGenresDbStorage filmGenresDbStorage) {
         this.jdbcTemplate = jdbcTemplate;
+        this.filmGenresDbStorage = filmGenresDbStorage;
     }
 
     @Override
@@ -49,31 +52,9 @@ public class FilmDbStorage implements FilmStorage {
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         log.info("filmId= {}", film.getId());
-        saveGenre(film);
+        filmGenresDbStorage.saveGenre(film);
         log.info("жанр сохранился");
         return getFilmById(film.getId());
-    }
-
-    private void saveGenre(Film film) {
-        final int filmId = film.getId();
-        jdbcTemplate.update("delete from FILM_GENRES where FILM_ID = ?", filmId);
-        List<Genre> genres = film.getGenres();
-        if (genres == null || genres.isEmpty()) {
-            return;
-        }
-        final ArrayList<Genre> genreList = new ArrayList<>(genres);
-        jdbcTemplate.batchUpdate(
-                "merge into FILM_GENRES (FILM_ID, GENRE_ID) values (?, ?)",
-                new BatchPreparedStatementSetter() {
-                    public void setValues(PreparedStatement ps, int i) throws SQLException {
-                        ps.setInt(1, filmId);
-                        ps.setInt(2, genreList.get(i).getId());
-                    }
-
-                    public int getBatchSize() {
-                        return genreList.size();
-                    }
-                });
     }
 
     @Override
@@ -91,7 +72,7 @@ public class FilmDbStorage implements FilmStorage {
                     , film.getRate()
                     , film.getMpa().getId()
                     , film.getId());
-            saveGenre(film);
+            filmGenresDbStorage.saveGenre(film);
             return getFilmById(film.getId());
         }
         throw new NotFoundException("Такого пользователя нет");
@@ -141,6 +122,13 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    private void setGenres(Film film){
+        String sql = "SELECT FG.GENRE_ID, G.NAME FROM FILM_GENRES FG JOIN GENRES G ON FG.GENRE_ID = G.GENRE_ID " +
+                "WHERE FILM_ID = ? GROUP BY FG.GENRE_ID";
+        List<Genre> genres = new ArrayList<>(jdbcTemplate.query(sql, this :: makeGenre, film.getId()));
+        film.setGenres(genres);
+    }
+
     private void setLikes(Film film){
         String sql = "SELECT COUNT(FILM_ID), USER_ID FROM LIKES L WHERE L.FILM_ID = ? GROUP BY USER_ID;";
         Set<Integer> likes = new HashSet<>(jdbcTemplate.query(sql, this :: makeLikes, film.getId()));
@@ -150,14 +138,8 @@ public class FilmDbStorage implements FilmStorage {
     private int makeLikes(ResultSet resultSet, int RowNum) throws SQLException {
         return resultSet.getInt("USER_ID");
     }
-    private void setGenres(Film film){
-        String sql = "SELECT FG.GENRE_ID, G.NAME FROM FILM_GENRES FG JOIN GENRES G ON FG.GENRE_ID = G.GENRE_ID " +
-                "WHERE FILM_ID = ? GROUP BY FG.GENRE_ID";
-        List<Genre> genres = new ArrayList<>(jdbcTemplate.query(sql, this :: makeGenre, film.getId()));
-        film.setGenres(genres);
-    }
 
-    private Genre makeGenre(ResultSet resultSet, int RowNum) throws SQLException {
+    public Genre makeGenre(ResultSet resultSet, int RowNum) throws SQLException {
         return new Genre(resultSet.getInt("GENRE_ID"), resultSet.getString("NAME"));
     }
 

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.exceptionsHandler.NotFoundException;
 import ru.yandex.practicum.filmorate.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dao.LikesDbStorage;
 import ru.yandex.practicum.filmorate.dao.UserDbStorage;
@@ -32,7 +32,7 @@ public class FilmService {
         List<Film> films = filmDbStorage.getAllFilms();
         List<User> users = userDbStorage.getAllUsers();
         if (!(films.contains(film)) && (!(users.contains(user)))) {
-            throw new NotFoundException("Такого фильма или пользователя нет");
+            throw new NotFoundException("Такого фильма и пользователя нет");
         } else {
             likesDbStorage.addLike(filmId, userId);
         }
@@ -44,7 +44,7 @@ public class FilmService {
         List<Film> films = filmDbStorage.getAllFilms();
         List<User> users = userDbStorage.getAllUsers();
         if (!(films.contains(film)) && (!(users.contains(user)))) {
-            throw new NotFoundException("Такого фильма или пользователя нет");
+            throw new NotFoundException("Такого фильма и пользователя нет");
         } else {
             likesDbStorage.removeLike(filmId, userId);
         }

@@ -23,7 +23,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDbStorage(JdbcTemplate jdbcTemplate){
+    public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -38,14 +38,14 @@ public class UserDbStorage implements UserStorage {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getName());
             final LocalDate birthday = user.getBirthday();
-            if(birthday == null){
+            if (birthday == null) {
                 stmt.setNull(4, Types.DATE);
-            } else{
+            } else {
                 stmt.setDate(4, Date.valueOf(birthday));
             }
             return stmt;
         }, keyHolder);
-            user.setId(keyHolder.getKey().intValue());
+        user.setId(keyHolder.getKey().intValue());
         return user;
     }
 
@@ -55,7 +55,7 @@ public class UserDbStorage implements UserStorage {
                 "where USER_ID = ?";
         String sqlQuery2 = "select EMAIL, LOGIN, USER_NAME, USER_BIRTHDAY from USERS where USER_ID = ?";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery2, user.getId());
-        if(userRows.next()) {
+        if (userRows.next()) {
             jdbcTemplate.update(sqlQuery
                     , user.getEmail()
                     , user.getLogin()
@@ -68,10 +68,10 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getUserById(int id){
+    public User getUserById(int id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID, LOGIN, EMAIL, USER_NAME, USER_BIRTHDAY " +
                 "from USERS where USER_ID = ?", id);
-        if(userRows.next()) {
+        if (userRows.next()) {
             User user = new User(
                     userRows.getInt("USER_ID"),
                     userRows.getString("EMAIL"),
@@ -82,15 +82,15 @@ public class UserDbStorage implements UserStorage {
                     userRows.getString("USER_NAME"));
             return user;
         } else {
-        log.info("Пользователь с идентификатором {} не найден.", id);
-        throw new NotFoundException("Такого пользователя нет");
-    }
+            log.info("Пользователь с идентификатором {} не найден.", id);
+            throw new NotFoundException("Такого пользователя нет");
+        }
     }
 
-    private User makeUser(ResultSet rs) throws SQLException {
+    User makeUser(ResultSet rs) throws SQLException {
         Integer id = rs.getInt("USER_ID");
         String email = rs.getString("EMAIL");
-        String login =  rs.getString("LOGIN");
+        String login = rs.getString("LOGIN");
         String name = rs.getString("USER_NAME");
         LocalDate birthday = rs.getDate("USER_BIRTHDAY").toLocalDate();
         return new User(id, email, login, name, birthday);
@@ -99,23 +99,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAllUsers() {
         String sql = "select USER_ID,  LOGIN, EMAIL, USER_NAME, USER_BIRTHDAY from USERS";
-        return jdbcTemplate.query(sql,(rs, rowNum) -> makeUser(rs));
-    }
-
-    public void addFriend(int userId, int friendId) {
-        getUserById(userId);
-        getUserById(friendId);
-        String sqlQuery = "merge into FRIENDS(USER_ID, FRIEND_ID) values (?, ?)";
-        jdbcTemplate.update(sqlQuery, userId, friendId);
-    }
-
-    public void deleteFriend(int userId, int friendId) {
-        String sqlQuery = "delete from FRIENDS where USER_ID = ? AND FRIEND_ID = ?";
-        String sqlQuery2 = "select EMAIL, LOGIN, USER_NAME, USER_BIRTHDAY from USERS where USER_ID = ?";
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery2, userId);
-        if (userRows.next()) {
-            jdbcTemplate.update(sqlQuery, userId, friendId);
-        }
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeUser(rs));
     }
 
     @Override
@@ -129,17 +113,6 @@ public class UserDbStorage implements UserStorage {
         if ((user.getName() == null || user.getName().length() == 0)) {
             user.setName(user.getLogin());
         }
-    }
-
-    public List<User> getUserFriends(int id) {
-        String sqlQuery = "select * from USERS, FRIENDS where USERS.USER_ID = FRIENDS.FRIEND_ID and FRIENDS.USER_ID = ?";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs), id);
-    }
-
-    public List<User> findCommonFriends(int userId, int friendId) {
-        final String sqlQuery = "select * from users u, friends f, friends o " +
-                "where u.USER_ID = f.FRIEND_ID and u.USER_ID = o.FRIEND_ID and f.USER_ID = ? and o.USER_ID = ?";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs), userId, friendId);
     }
 }
 

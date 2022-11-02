@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Storage.UserStorage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.dao.FriendsDbStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.dao.UserDbStorage;
 
@@ -13,26 +13,26 @@ import java.util.List;
 public class UserService {
 
     private final UserDbStorage userDbStorage;
-    private final InMemoryUserStorage userStorage;
+    private final FriendsDbStorage friendsDbStorage;
 
     @Autowired
     public UserService(@Qualifier("UserDbStorage") UserDbStorage userDbStorage,
-                       @Qualifier("MemoryStorage") InMemoryUserStorage userStorage) {
+                       @Qualifier("FriendsDbStorage")FriendsDbStorage friendsDbStorage) {
         this.userDbStorage = userDbStorage;
-        this.userStorage = userStorage;
+        this.friendsDbStorage =friendsDbStorage;
     }
 
 
     public void addFriend(int userId, int friendId) {
-        userDbStorage.addFriend(userId, friendId);
+        friendsDbStorage.addFriend(userId, friendId);
     }
 
     public void deleteFriend(int userId, int friendId) {
-        userDbStorage.deleteFriend(userId, friendId);
+        friendsDbStorage.deleteFriend(userId, friendId);
     }
 
     public List<User> findCommonFriends(int userId, int friendId) {
-        return userDbStorage.findCommonFriends(userId, friendId);
+        return friendsDbStorage.findCommonFriends(userId, friendId);
     }
 
     public User addUser(User user) {
@@ -53,7 +53,7 @@ public class UserService {
     }
 
     public List<User> getUserFriends(int userId) {
-        return userDbStorage.getUserFriends(userId);
+        return friendsDbStorage.getUserFriends(userId);
     }
 }
 

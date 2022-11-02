@@ -22,16 +22,16 @@ public class MpaDbStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Mpa> getAllMpa(){
+    public List<Mpa> getAllMpa() {
         String sql = "SELECT * FROM MPA";
         List<Mpa> mpas = jdbcTemplate.query(sql, (rs, rowNum) ->
                 new Mpa(rs.getInt("MPA_ID"), rs.getString("MPA_NAME")));
         return mpas;
     }
 
-    public Mpa getMpaById(int id){
+    public Mpa getMpaById(int id) {
         SqlRowSet mpaRows = jdbcTemplate.queryForRowSet("SELECT * FROM MPA WHERE MPA_ID = ?", id);
-        if(mpaRows.next()){
+        if (mpaRows.next()) {
             Mpa mpa = new Mpa(mpaRows.getInt("MPA_ID"), mpaRows.getString("MPA_NAME"));
             log.info("Найден Mpa с id{}", id);
             return mpa;

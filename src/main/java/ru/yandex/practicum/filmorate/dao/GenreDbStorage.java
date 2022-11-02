@@ -8,11 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.Exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class GenreDbStorage {
@@ -21,11 +17,11 @@ public class GenreDbStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public GenreDbStorage(JdbcTemplate jdbcTemplate){
+    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Genre> getAllGenres(){
+    public List<Genre> getAllGenres() {
         log.info("Вызван метод getAllGenres");
         String sql = "SELECT * FROM GENRES";
         List<Genre> genres = jdbcTemplate.query(sql, (rs, rowNum) ->
@@ -33,9 +29,9 @@ public class GenreDbStorage {
         return genres;
     }
 
-    public Genre getGenreById(int id){
+    public Genre getGenreById(int id) {
         SqlRowSet genreRows = jdbcTemplate.queryForRowSet("SELECT * FROM GENRES WHERE GENRE_ID = ?", id);
-        if(genreRows.next()){
+        if (genreRows.next()) {
             Genre genre = new Genre(genreRows.getInt("GENRE_ID"), genreRows.getString("NAME"));
             log.info("Найден Genre с id{}", id);
             return genre;

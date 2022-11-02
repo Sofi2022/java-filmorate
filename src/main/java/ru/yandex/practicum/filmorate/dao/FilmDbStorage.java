@@ -150,7 +150,6 @@ public class FilmDbStorage implements FilmStorage {
     private int makeLikes(ResultSet resultSet, int RowNum) throws SQLException {
         return resultSet.getInt("USER_ID");
     }
-
     private void setGenres(Film film){
         String sql = "SELECT FG.GENRE_ID, G.NAME FROM FILM_GENRES FG JOIN GENRES G ON FG.GENRE_ID = G.GENRE_ID " +
                 "WHERE FILM_ID = ? GROUP BY FG.GENRE_ID";
@@ -189,23 +188,5 @@ public class FilmDbStorage implements FilmStorage {
                 "F.MPA_ID = MPA.MPA_ID GROUP BY F.FILM_ID ORDER BY COUNT(DISTINCT L.USER_ID) DESC LIMIT ?";
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeFilm(rs), count);
     }
-
-    public void addLike(int filmId, int userId) {
-        String sqlQuery = "merge into LIKES (FILM_ID, USER_ID) VALUES (?, ?)";
-        jdbcTemplate.update(sqlQuery, filmId, userId);
-        updateRate(filmId);
-    }
-
-    private void updateRate(int filmId) {
-        String sqlQuery = "update FILMS as f set rate = (select count (l.USER_ID) from LIKES as l " +
-                "where l.FILM_ID = f.FILM_ID) where f.FILM_ID = ?";
-        jdbcTemplate.update(sqlQuery, filmId);
-    }
-
-    public void removeLike(int filmId, int userId) {
-            String sqlQuery = "delete from LIKES where FILM_ID = ? and USER_ID = ?";
-            jdbcTemplate.update(sqlQuery, filmId, userId);
-            updateRate(filmId);
-        }
 }
 

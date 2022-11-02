@@ -13,15 +13,15 @@ public class MpaService {
     private final MpaDbStorage mpaDbStorage;
 
     @Autowired
-    public MpaService(MpaDbStorage mpaDbStorage){
+    public MpaService(MpaDbStorage mpaDbStorage) {
         this.mpaDbStorage = mpaDbStorage;
     }
 
-    public List<Mpa> getAllMpa(){
+    public List<Mpa> getAllMpa() {
         return mpaDbStorage.getAllMpa();
     }
 
-    public Mpa getMpaById(int id){
+    public Mpa getMpaById(int id) {
         return mpaDbStorage.getMpaById(id);
     }
 }

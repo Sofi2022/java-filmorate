@@ -8,13 +8,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
 @Data
 @NoArgsConstructor
-//@AllArgsConstructor
 public class Film {
 
     private Integer id;
@@ -33,11 +34,11 @@ public class Film {
 
     private Mpa mpa;
 
-    Set<Genre> genres = new HashSet<>();
+    List<Genre> genres = new ArrayList<>();
     private  Set<Integer> likes = new HashSet<>();
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rate, Mpa mpa,
-                Set<Genre> genres, Set<Integer> likes) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Mpa mpa,
+                List<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -46,7 +47,6 @@ public class Film {
         this.rate = rate;
         this.mpa = mpa;
         this.genres = genres;
-        this.likes = likes;
     }
 
     public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, int rate, Mpa mpa) {
@@ -73,15 +73,11 @@ public class Film {
         return likes;
     }
 
-    //public int getRate() {
-     //   return rate;
-    //}
-
     public Mpa getMpa(){
         return mpa;
     }
 
-    public Set<Genre> getGenres(){
+    public List<Genre> getGenres(){
         return genres;
     }
 }

@@ -67,10 +67,8 @@ public class UserDbStorage implements UserStorage {
         throw new NotFoundException("Такого пользователя нет");
     }
 
-
     @Override
     public User getUserById(int id){
-        //return jdbcTemplate.query(sql,(rs, rowNum) -> makeUser(id,rs));
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select USER_ID, LOGIN, EMAIL, USER_NAME, USER_BIRTHDAY " +
                 "from USERS where USER_ID = ?", id);
         if(userRows.next()) {
@@ -133,21 +131,15 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-    public List<User> getUserFriends(int id){
+    public List<User> getUserFriends(int id) {
         String sqlQuery = "select * from USERS, FRIENDS where USERS.USER_ID = FRIENDS.FRIEND_ID and FRIENDS.USER_ID = ?";
-        return jdbcTemplate.query(sqlQuery,(rs, rowNum) -> makeUser(rs), id);
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs), id);
     }
 
-    public List<User> findCommonFriends(int userId, int friendId){
+    public List<User> findCommonFriends(int userId, int friendId) {
         final String sqlQuery = "select * from users u, friends f, friends o " +
                 "where u.USER_ID = f.FRIEND_ID and u.USER_ID = o.FRIEND_ID and f.USER_ID = ? and o.USER_ID = ?";
         return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> makeUser(rs), userId, friendId);
-//        List<User> firstUserFriends = getUserFriends(userId);
-//        List<User> secondUserFriends = getUserFriends(friendId);
-
-//        return firstUserFriends.stream().
-//                filter(secondUserFriends ::contains).
-//                collect(Collectors.toList());
     }
 }
 

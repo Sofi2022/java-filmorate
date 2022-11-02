@@ -1,15 +1,23 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.Service.FilmService;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class FilmController {
+
+
+    private final Logger log = LoggerFactory.getLogger(FilmController.class);
 
     private final FilmService filmService;
 
@@ -35,7 +43,7 @@ public class FilmController {
 
     @DeleteMapping("/films/{id}/like/{userId}")
     public void removeLikeForFilm(@PathVariable("id")int filmId, @PathVariable int userId) {
-       filmService.deleteLike(filmId, userId);
+      filmService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/films/popular")
@@ -51,5 +59,6 @@ public class FilmController {
     @GetMapping("/films")
     public List<Film> getFilms() {
         return filmService.getAllFilms();
+
     }
 }

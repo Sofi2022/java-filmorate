@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+@Component("MemoryStorage")
 public class InMemoryUserStorage implements UserStorage {
 
     private Integer userId = 0;
@@ -26,7 +26,7 @@ public class InMemoryUserStorage implements UserStorage {
         if (users.containsKey(user.getId())) {
             return updateUser(user);
         } else {
-            validateUser(user);
+            //validateUser(user);
             user.setId(++userId);
             users.put(user.getId(), user);
             return user;
@@ -38,7 +38,7 @@ public class InMemoryUserStorage implements UserStorage {
         if(!(users.containsKey(user.getId()))){
             throw new NotFoundException("Добавьте изменения пользователя");
         }
-            validateUser(user);
+            //validateUser(user);
             users.put(user.getId(), user);
             return user;
     }

@@ -14,7 +14,7 @@ import java.util.Set;
 @Component
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 public class Film {
 
     private Integer id;
@@ -29,19 +29,40 @@ public class Film {
     @Min(1)
     private int duration;
 
+    private int rate;
+
+    private Mpa mpa;
+
+    Set<Genre> genres = new HashSet<>();
     private  Set<Integer> likes = new HashSet<>();
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, int rate, Mpa mpa,
+                Set<Genre> genres, Set<Integer> likes) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.rate = rate;
+        this.mpa = mpa;
+        this.genres = genres;
+        this.likes = likes;
+    }
+
+    public Film(Integer id, String name, String description, LocalDate releaseDate, int duration, int rate, Mpa mpa) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rate = rate;
+        this.mpa = mpa;
     }
 
     public void addLike(int userId){
         likes.add(userId);
         System.out.println("likes: " + likes);
-        //rate = likes.size();
+        rate = likes.size();
     }
 
     public void deleteLike(int userId){
@@ -50,5 +71,17 @@ public class Film {
 
     public Set<Integer> getLikes() {
         return likes;
+    }
+
+    //public int getRate() {
+     //   return rate;
+    //}
+
+    public Mpa getMpa(){
+        return mpa;
+    }
+
+    public Set<Genre> getGenres(){
+        return genres;
     }
 }
